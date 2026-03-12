@@ -18,7 +18,7 @@
 param (
     [Parameter(Mandatory=$false, HelpMessage="To ensure script is re-run interactive for the user as SYSTEM")][switch]$InvokeToInteractiveUser,
     [Parameter(Mandatory=$false, HelpMessage="To show custom banner or not")][bool]$UseCustomPSADTBanner = $true,
-    [Parameter(Mandatory=$false, HelpMessage="To cancel user closing window or not")][bool]$CancelClosingWindow = $true
+    [Parameter(Mandatory=$false, HelpMessage="To cancel user closing window or not")][bool]$CancelClosingWindow = $false
 )
 
 #Variables
@@ -29,7 +29,7 @@ New-Variable -Name "RegistryKeyPath" -Value "HKLM:\Software\EndpointAdmin\Bitloc
 New-Variable -Name "LogLocation" -Value "$env:ProgramData\Microsoft\IntuneManagementExtension\Logs" -Description "Shared var between runspaces" -Scope Global
 New-Variable -Name "LogName" -Value "Invoke-SetBitLockerPINPrompt" -Description "Shared var between runspaces" -Scope Global
 New-Variable -Name "CancelUserClosingWindow" -Value $CancelClosingWindow -Description "Shared var between runspaces" -Scope Global
-New-Variable -Name "DryRun" -Value $true -Description "Shared var between runspaces" -Scope Global
+New-Variable -Name "DryRun" -Value $false -Description "Shared var between runspaces" -Scope Global
 New-Variable -Name "DryRunEnforceError" -Value $false -Description "Shared var between runspaces" -Scope Global # when used, DryRun must also be true
 New-Variable -Name "UseBanner" -Value $UseCustomPSADTBanner -Description "Shared var between runspaces" -Scope Global
 
