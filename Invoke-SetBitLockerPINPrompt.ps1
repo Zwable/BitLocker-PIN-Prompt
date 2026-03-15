@@ -1057,7 +1057,8 @@ function Show-NotificationMessage {
                                     &#160;• Length must be between 4 and 20 characters, and may include letters, numbers, and supported special symbols.<LineBreak />
                                     &#160;• The PIN must differ from your Windows user account password.<LineBreak />
                                     &#160;• Avoid including any personal identifiers, such as your name or date of birth.<LineBreak />
-                                    &#160;• Use only standard English alphabet characters (no regional or accented letters).<LineBreak /><LineBreak />
+                                    &#160;• Use only standard English alphabet characters (no regional or accented letters).<LineBreak />
+                                    &#160;• Do not include sequences of three or more consecutive letters or numbers (e.g., abc, 123).<LineBreak /><LineBreak /><LineBreak />
 
                                     <Bold>Additional Resources</Bold><LineBreak />
                                     For further guidance contanct your IT department
@@ -1328,9 +1329,42 @@ function Test-BitLockerPINProtectorSet {
         return $false
     }
 }
+function Test-BitLockerTpmAndPINProtectorSet {
+
+    # Always show prompt when testing
+    if($DryRun) { return $false }
+
+    # Determine if PIN is configured
+    $Protectors = (Get-BitLockerVolume -MountPoint $env:SystemDrive).KeyProtector
+    $HasTPM = $Protectors | Where-Object { $_.KeyProtectorType -eq 'Tpm' }
+    $HasTPMPin = $Protectors | Where-Object { $_.KeyProtectorType -eq 'TpmPin' }
+
+    if ($HasTPM -and $HasTPMPin) {
+        Write-Log -LogOutput ("BitLocker TPM and TPMPIN is defined, cleanup needed to ensure Pre-Boot authentication") -ComponentName $($MyInvocation.MyCommand) -Path $LogLocation -Name $LogName
+        return $true
+    }else{
+        Write-Log -LogOutput ("BitLocker TPM and TPMPIN is not defined at the same time") -ComponentName $($MyInvocation.MyCommand) -Path $LogLocation -Name $LogName
+        return $false
+    }
+}
 
 # Resume bitlocker if falsely suspended
 if (Test-BitLockerShouldBeResumed) {
+    Resume-BitLocker -MountPoint  $env:SystemDrive | Out-Null
+}
+
+# Resume bitlocker if falsely suspended
+if (Test-BitLockerTpmAndPINProtectorSet) {
+
+    try {
+        Write-Log -LogOutput ("Removing Tpm protector key from system drive as both Tpm and TpmPin is present, otherwise Pre-Authentication would not occur") -ComponentName "Main" -Path $LogLocation -Name $LogName
+        $TpmProtector = $(Get-BitLockerVolume -MountPoint $env:SystemDrive).KeyProtector | Where-Object { $_.KeyProtectorType -eq 'Tpm' }
+        Remove-BitLockerKeyProtector -MountPoint $env:SystemDrive -KeyProtectorId $TpmProtector.KeyProtectorId
+    }
+    catch {
+        Write-Log -LogOutput ("Error: $_") -ComponentName "Main" -Path $LogLocation -Name $LogName
+    }
+
     Resume-BitLocker -MountPoint  $env:SystemDrive | Out-Null
 }
 

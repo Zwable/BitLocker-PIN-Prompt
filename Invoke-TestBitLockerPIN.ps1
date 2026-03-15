@@ -241,6 +241,21 @@ function Test-BitLockerPINProtectorSet {
         return $false
     }
 }
+function Test-BitLockerTpmAndPINProtectorSet {
+
+    # Determine if PIN is configured
+    $Protectors = (Get-BitLockerVolume -MountPoint $env:SystemDrive).KeyProtector
+    $HasTPM = $Protectors | Where-Object { $_.KeyProtectorType -eq 'Tpm' }
+    $HasTPMPin = $Protectors | Where-Object { $_.KeyProtectorType -eq 'TpmPin' }
+
+    if ($HasTPM -and $HasTPMPin) {
+        Write-Log -LogOutput ("BitLocker TPM and TPMPIN is defined, cleanup needed to ensure Pre-Boot authentication") -ComponentName $($MyInvocation.MyCommand) -Path $LogLocation -Name $LogName
+        return $true
+    }else{
+        Write-Log -LogOutput ("BitLocker TPM and TPMPIN is not defined at the same time") -ComponentName $($MyInvocation.MyCommand) -Path $LogLocation -Name $LogName
+        return $false
+    }
+}
 function Test-IfVirtualMachine {
 
     # Below is taken from PSADT
@@ -342,6 +357,11 @@ if( -not [string]::IsNullOrEmpty($RunningPID) ) {
 
 # If bitlocker should be resumed
 if (Test-BitLockerShouldBeResumed) {
+    Exit-Script -ExitCode 1
+}
+
+# If bitlocker should be resumed
+if (Test-BitLockerTpmAndPINProtectorSet) {
     Exit-Script -ExitCode 1
 }
 
