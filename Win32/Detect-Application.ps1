@@ -2,7 +2,7 @@
 [string]$UserName = [Environment]::UserName
 [string]$Global:LogLocation = "$env:ProgramData\Microsoft\IntuneManagementExtension\Logs"
 [string]$RegistryKeyPath = "HKLM:\Software\EndpointAdmin\BitlockerPin"
-[string]$Global:LogName = "SetBitLockerPINPrompt"
+[string]$Global:LogName = "Invoke-TestBitlockerPIN"
 [int]$Global:ExitCode = 0 #Global for usage inside functions
 $ErrorActionPreference = 'SilentlyContinue'
 
