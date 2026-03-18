@@ -1,0 +1,24 @@
+<Configuration>
+  <Name>BitLocker PIN Setup Prompt</Name>
+  <Publisher>Endpoint Admin</Publisher>
+  <Version>1.0</Version>
+  <Description>The BitLocker PIN Setup Prompt is a secure application that guides users through setting a BitLocker pre-boot authentication PIN. This PIN enhances device security by requiring user authentication before Windows starts, in compliance with organizational encryption policies.</Description>
+  <Developer>
+  </Developer>
+  <Icon>icon.png</Icon>
+  <Notes>
+  </Notes>
+  <InformationUrl>https://www.endpointadmin.com</InformationUrl>
+  <PrivacyUrl>
+  </PrivacyUrl>
+  <IsFeatured>false</IsFeatured>
+  <InstallExperience>system</InstallExperience>
+  <RunAs32Bit>false</RunAs32Bit>
+  <InstallCmd>Deploy-Application.exe</InstallCmd>
+  <UninstallCmd>Deploy-Application.exe uninstall</UninstallCmd>
+  <Owner>Endpoint Admin</Owner>
+  <Architecture>x64</Architecture>
+  <MinimumOs>
+    <v10_1607 valid="true" />
+  </MinimumOs>
+</Configuration>
