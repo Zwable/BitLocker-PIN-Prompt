@@ -1,0 +1,1 @@
+Invoke-SetBitLockerPINPrompt.ps1 goes in this folder
