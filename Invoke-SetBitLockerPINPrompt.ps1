@@ -1212,11 +1212,17 @@ function Show-NotificationMessage {
                                     Update-Window -Property "Close"
 
                                 }else {
+
                                     Write-Log -LogOutput ("Setting bitlocker PIN..") -ComponentName "Main" -Path $LogLocation -Name $LogName
                                     Add-BitLockerKeyProtector -MountPoint $env:SystemDrive -Pin $(ConvertTo-SecureString $syncHash.pbx_passwordfirst.Password -AsPlainText -Force) -TpmAndPinProtector -ErrorAction Stop
                                     [string]$DateTimeNow = Get-Date -Format yyyy-MM-ddTHH:mm:ssZ
                                     Set-RegistryKey -Key $RegistryKeyPath -Name "PINLastSet" -Value $DateTimeNow -Type "String"
-                                    # $Global:CancelUserClosingWindow = $false
+                                    if (Test-BitLockerTpmAndPINProtectorSet) {
+
+                                        Write-Log -LogOutput ("Removing Tpm protector key from system drive as both Tpm and TpmPin is present, otherwise Pre-Authentication would not occur") -ComponentName "Main" -Path $LogLocation -Name $LogName
+                                        $TpmProtector = $(Get-BitLockerVolume -MountPoint $env:SystemDrive).KeyProtector | Where-Object { $_.KeyProtectorType -eq 'Tpm' }
+                                        Remove-BitLockerKeyProtector -MountPoint $env:SystemDrive -KeyProtectorId $TpmProtector.KeyProtectorId
+                                    }
                                     Update-Window -Property "Close"
                                 }
                             }
@@ -1353,7 +1359,7 @@ if (Test-BitLockerShouldBeResumed) {
     Resume-BitLocker -MountPoint  $env:SystemDrive | Out-Null
 }
 
-# Resume bitlocker if falsely suspended
+# Remove Tpm key protector if present with TpmPin
 if (Test-BitLockerTpmAndPINProtectorSet) {
 
     try {
@@ -1364,8 +1370,6 @@ if (Test-BitLockerTpmAndPINProtectorSet) {
     catch {
         Write-Log -LogOutput ("Error: $_") -ComponentName "Main" -Path $LogLocation -Name $LogName
     }
-
-    Resume-BitLocker -MountPoint  $env:SystemDrive | Out-Null
 }
 
 # Set BitLocker PIN if not already set
