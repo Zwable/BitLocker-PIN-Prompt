@@ -613,9 +613,9 @@ function Show-NotificationMessage {
     New-Variable -Name "MinimumPIN" -Value $minLength -Description "Shared var between runspaces" -Scope Global
     New-Variable -Name "UseEnhancedPin" -Value $allowSpecial -Description "Shared var between runspaces" -Scope Global
     if ($allowSpecial) {
-        $passwordText = "BitLocker protects this device to prevent unauthorized access to your files and documents, even if someone has physical access. To help keep your data safe, you wll need to enter a code each time the computer starts. Choose a code that is <Bold>between $($MinimumPIN) and 20</Bold> characters long. It <Bold>must not be the same as your PC password</Bold> and should only include letters from the <Bold>English alphabet</Bold> (no special or language-specific characters)."
+        $passwordText = "BitLocker protects this device to prevent unauthorized access to your files and documents, even if someone has physical access. To help keep your data safe, you will need to enter a code each time the computer starts. Choose a code that is <Bold>between $($MinimumPIN) and 20</Bold> characters long. It <Bold>must not be the same as your PC password</Bold> and should only include letters from the <Bold>English alphabet</Bold> (no special or language-specific characters)."
     }else {
-        $passwordText = "BitLocker protects this device to prevent unauthorized access to your files and documents, even if someone has physical access. To help keep your data safe, you wll need to enter a code each time the computer starts. Choose a code that is <Bold>between $($MinimumPIN) and 20</Bold> numbers long."
+        $passwordText = "BitLocker protects this device to prevent unauthorized access to your files and documents, even if someone has physical access. To help keep your data safe, you will need to enter a code each time the computer starts. Choose a code that is <Bold>between $($MinimumPIN) and 20</Bold> numbers long."
     }
     New-Variable -Name "passwordComplexityText" -Value $passwordText -Description "Shared var between runspaces" -Scope Global
     Write-Log "Minimum PIN length is '$($minLength)' and enhanced PIN enabled is '$($allowSpecial)'" -ComponentName "Main" -Path $LogLocation -Name $LogName
@@ -1061,7 +1061,7 @@ function Show-NotificationMessage {
                                     &#160;• Do not include sequences of three or more consecutive letters or numbers (e.g., abc, 123).<LineBreak /><LineBreak /><LineBreak />
 
                                     <Bold>Additional Resources</Bold><LineBreak />
-                                    For further guidance contanct your IT department
+                                    For further guidance contact your IT department
                                     </TextBlock>
                                 </StackPanel>
                             </Grid>

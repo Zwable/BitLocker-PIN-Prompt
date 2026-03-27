@@ -256,51 +256,6 @@ function Test-BitLockerTpmAndPINProtectorSet {
         return $false
     }
 }
-function Test-IfVirtualMachine {
-
-    # Below is taken from PSADT
-    $hwBios = Get-WmiObject -Class 'Win32_BIOS' -ErrorAction 'Stop' | Select-Object -Property 'Version', 'SerialNumber'
-    $hwMakeModel = Get-WmiObject -Class 'Win32_ComputerSystem' -ErrorAction 'Stop' | Select-Object -Property 'Model', 'Manufacturer'
-
-    If ($hwBIOS.Version -match 'VRTUAL') {
-        $hwType = 'Virtual:Hyper-V'
-    }
-    ElseIf ($hwBIOS.Version -match 'A M I') {
-        $hwType = 'Virtual:Virtual PC'
-    }
-    ElseIf ($hwBIOS.Version -like '*Xen*') {
-        $hwType = 'Virtual:Xen'
-    }
-    ElseIf ($hwBIOS.SerialNumber -like '*VMware*') {
-        $hwType = 'Virtual:VMWare'
-    }
-    ElseIf ($hwBIOS.SerialNumber -like '*Parallels*') {
-        $hwType = 'Virtual:Parallels'
-    }
-    ElseIf (($hwMakeModel.Manufacturer -like '*Microsoft*') -and ($hwMakeModel.Model -notlike '*Surface*')) {
-        $hwType = 'Virtual:Hyper-V'
-    }
-    ElseIf ($hwMakeModel.Manufacturer -like '*VMWare*') {
-        $hwType = 'Virtual:VMWare'
-    }
-    ElseIf ($hwMakeModel.Manufacturer -like '*Parallels*') {
-        $hwType = 'Virtual:Parallels'
-    }
-    ElseIf ($hwMakeModel.Model -like '*Virtual*') {
-        $hwType = 'Virtual'
-    }
-    Else {
-        $hwType = 'Physical'
-    }
-
-    if ($hwType -match "VIRTUAL") {
-        Write-Log -LogOutput ("Workstation is on virtual environment, HW type '{0}'" -f $HWBIOS.Version) -ComponentName $($MyInvocation.MyCommand) -Path $LogLocation -Name $LogName
-        return $true
-    }else {
-        Write-Log -LogOutput ("Workstation is on physical environment, HW type '{0}'" -f $HWBIOS.Version) -ComponentName $($MyInvocation.MyCommand) -Path $LogLocation -Name $LogName
-        return $false
-    }
-}
 function Exit-Script {
     param (
         [Parameter(Mandatory=$true, HelpMessage="Provide exit code")][string]$ExitCode
@@ -318,12 +273,6 @@ function Exit-Script {
 
 #Write log
 Write-Log -LogOutput ((" ----------------------------------------------------- Checking values ({0}) ----------------------------------------------------- ") -f $UserName) -ComponentName "Main" -Path $LogLocation -Name $LogName
-
-# Test if virtual machine 
-if (Test-IfVirtualMachine) {
-    Write-Log -LogOutput ("Running on virtual environment, skipping remediation..") -ComponentName "Main" -Path $LogLocation -Name $LogName
-    Exit-Script -ExitCode 0
-}
 
 # Test to see if OOBE is running
 if (Test-RunningOOBE) {
